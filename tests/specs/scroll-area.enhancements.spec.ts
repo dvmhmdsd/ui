@@ -325,6 +325,31 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     expect(await distanceToEnd(page, chat.label)).toBeGreaterThan(50)
   })
 
+  test("a wheel toward the end at the end keeps following when sizes are fractional", async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== "chromium",
+      "Only Chromium rounds the end this way."
+    )
+    // With these sizes, a wheel at the end in Chromium stops a pixel short of
+    // where sticking scrolled, so it moves the view a pixel up.
+    await viewport(page, chat.label).evaluate((el) => {
+      el.style.cssText += "height:220.4px;margin-top:10.37px;padding-top:3.3px"
+      ;(el.firstElementChild as HTMLElement).style.paddingBlockEnd = "12.6px"
+    })
+    await press(page, "Add message")
+    await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
+    await viewport(page, chat.label).hover()
+    await page.mouse.wheel(0, 200)
+    await settle(page)
+    expect(await distanceToEnd(page, chat.label)).toBe(1)
+    await expect(area(page, chat.label)).toHaveAttribute("data-sticking", "")
+    await press(page, "Add message")
+    await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
+  })
+
   test("PageUp in the viewport lets go", async ({ page }) => {
     await viewport(page, chat.label).focus()
     await page.keyboard.press("PageUp")

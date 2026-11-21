@@ -164,6 +164,12 @@ describe("sticking to the end", () => {
     expect(followsEnd(true, { delta: -100, after: 0 })).toBe(true)
   })
 
+  test("a pixel short of the end still counts as the end", () => {
+    expect(followsEnd(true, { delta: -1, after: 1 })).toBe(true)
+    expect(followsEnd(false, { delta: 40, after: 1 })).toBe(true)
+    expect(followsEnd(true, { delta: -2, after: 2 })).toBe(false)
+  })
+
   test("reaching the end while moving toward it follows again, and nothing else does", () => {
     expect(followsEnd(false, { delta: 30, after: 0.5 })).toBe(true)
     expect(followsEnd(false, { delta: 30, after: 20 })).toBe(false)

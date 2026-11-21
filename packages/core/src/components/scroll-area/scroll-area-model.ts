@@ -192,7 +192,9 @@ function followsEnd(
   following: boolean,
   scroll: { delta: number; after: number }
 ) {
-  const atEnd = scroll.after < edgeTolerance
+  // Inclusive: where sizes round, Chrome's wheel stops a whole pixel short of
+  // the end `scrollTo` reaches.
+  const atEnd = scroll.after <= edgeTolerance
   if (following) {
     return atEnd || scroll.delta >= 0
   }
